@@ -1,0 +1,131 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.pdf-wrapper {
+  width: min(100%, 800px);
+  max-width: 100%;
+}
+
+.pdf-viewer {
+  height: min(1123px, calc(100dvh - 400px));
+  width: 100%;
+  display: block;
+}
+
+/* PDF.js fallback: pages stacked as canvases, scrolling inside the frame. */
+.pdf-pages {
+  overflow-y: auto;
+  background-color: #f2f2f2;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.pdf-pages ::ng-deep canvas {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  background-color: white;
+}
+
+.pdf-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  width: min(100%, 800px);
+}
+
+/* Desktop: side by side, Back on the left and Download on the right. */
+@media (min-width: 768px) {
+  .button-row {
+    flex-direction: row-reverse;
+    justify-content: center;
+  }
+}
+
+button,
+a.btn-download {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+a.btn-download {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-back,
+.btn-open,
+a.btn-download {
+  width: min(100%, 240px);
+  border-radius: 999px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.btn-back {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-download,
+.btn-open {
+  background-color: #0066cc;
+  color: white;
+}
+
+.btn-back:hover {
+  background-color: #c8c8c8;
+}
+
+.btn-download:hover,
+.btn-open:hover {
+  background-color: #0052a3;
+}
+
+.share-row {
+  margin-top: 16px;
+}
+
+.link-share {
+  background: none;
+  border: none;
+  color: #0066cc;
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.link-share:hover {
+  color: #0052a3;
+}
+
+@media (min-width: 768px) {
+  .share-row {
+    display: none;
+  }
+}
