@@ -8,7 +8,7 @@
   font-family: sans-serif;
 }
 
-h1 {
+h2 {
   margin-top: 64px;
   margin-bottom: 16px;
   text-align: center;
@@ -24,6 +24,33 @@ h1 {
   width: 100%;
   height: min(1123px, calc(100dvh - 400px));
 }
+
+// Shown inside the <object> only when the browser can't display the PDF.
+.pdf-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.pdf-fallback-link {
+  color: #0066cc;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.icon-link {
+  margin-left: 4px;
+  vertical-align: text-bottom;
+}
+
 .button-row {
   display: flex;
   flex-direction: column;
@@ -86,6 +113,9 @@ a.btn-download {
 }
 
 .link-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   color: #0066cc;
@@ -93,6 +123,11 @@ a.btn-download {
   font-size: 0.95rem;
   text-decoration: underline;
   padding: 0;
+}
+
+.icon {
+  width: 1.25em;
+  height: 1.25em;
 }
 
 .link-share:hover {

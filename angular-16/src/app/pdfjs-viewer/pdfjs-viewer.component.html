@@ -1,4 +1,4 @@
-<h1>View Individual Tax Notices</h1>
+<h2>View Individual Tax Notices</h2>
 
 <div class="pdf-wrapper">
   <div class="pdf-viewer pdf-pages" #pages aria-label="PDF document preview"></div>
@@ -11,6 +11,7 @@
 
 <div class="share-row" *ngIf="canShare">
   <button class="link-share" type="button" (click)="shareLink()">
-    Share Link
+    <img class="icon" src="assets/pdf-icons/share.svg" alt="" />
+    <span>Share Link</span>
   </button>
 </div>

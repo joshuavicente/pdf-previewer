@@ -8,7 +8,7 @@
   font-family: sans-serif;
 }
 
-h1 {
+h2 {
   margin-top: 64px;
   margin-bottom: 16px;
   text-align: center;
@@ -103,6 +103,9 @@ a.btn-download {
 }
 
 .link-share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   color: #0066cc;
@@ -110,6 +113,11 @@ a.btn-download {
   font-size: 0.95rem;
   text-decoration: underline;
   padding: 0;
+}
+
+.icon {
+  width: 1.25em;
+  height: 1.25em;
 }
 
 .link-share:hover {

@@ -13,7 +13,7 @@
         padding: 32px;
       }
 
-      h1 {
+      h2 {
         margin-top: 64px;
         margin-bottom: 16px;
       }
@@ -24,6 +24,9 @@
       }
 
       .link-share {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         background: none;
         border: none;
         color: #0066cc;
@@ -35,6 +38,11 @@
 
       .link-share:hover {
         color: #0052a3;
+      }
+
+      .icon {
+        width: 1.25em;
+        height: 1.25em;
       }
 
       .pdf-viewer {
@@ -102,6 +110,11 @@
         font-weight: bold;
       }
 
+      .icon-link {
+        margin-left: 4px;
+        vertical-align: text-bottom;
+      }
+
       .btn-back {
         background-color: #e0e0e0;
         color: #333;
@@ -130,7 +143,7 @@
     </style>
   </head>
   <body>
-    <h1>View Individual Tax Notices</h1>
+    <h2>View Individual Tax Notices</h2>
 
     <div class="pdf-wrapper">
       <object
@@ -150,8 +163,11 @@
               target="_blank"
               rel="noopener"
             >
-              open the notice
-            </a>
+              open the notice<img
+                class="icon icon-link"
+                src="pdf-icons/link.svg"
+                alt=""
+            /></a>
             in a separate tab to review it before downloading.
           </div>
         </div>
@@ -164,7 +180,10 @@
     </div>
 
     <div class="share-row" id="shareRow">
-      <button class="link-share" onclick="shareLink()">Share Link</button>
+      <button class="link-share" onclick="shareLink()">
+        <img class="icon" src="pdf-icons/share.svg" alt="" />
+        <span>Share Link</span>
+      </button>
     </div>
 
     <script>

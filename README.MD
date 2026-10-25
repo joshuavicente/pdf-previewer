@@ -41,12 +41,15 @@ Boilerplates/
 ├── README.MD
 ├── plain/
 │   ├── test-pdf-boilerplate.html          # The plain demo page
+│   ├── pdf-icons/                         # share.svg, link.svg
 │   └── test_notice.pdf                    # Your PDF (A4)
 └── angular-16/
     ├── package.json                       # npm scripts: start, start:tunnel, build
     ├── angular.json                       # Copies the PDF.js worker into assets/pdfjs
     └── src/
-        ├── assets/test_notice.pdf         # Your PDF (A4)
+        ├── assets/
+        │   ├── test_notice.pdf            # Your PDF (A4)
+        │   └── pdf-icons/                 # share.svg, link.svg
         ├── styles.scss                    # Global styles (empty — each component styles itself)
         └── app/
             ├── app.routes.ts              # Routes + which PDF to show (PDF_SRC)
@@ -297,7 +300,12 @@ The PDF path is set once, as `PDF_SRC` in [app.routes.ts](angular-16/src/app/app
 
 ### `<object>` flow — `/object`
 
-[pdf-object-viewer.component.ts](angular-16/src/app/pdf-object-viewer/pdf-object-viewer.component.ts) points an `<object>` at the PDF and lets the browser display it. If the browser has no PDF viewer (for example, Android in-app browsers), it shows the text inside the `<object>` tag instead: *"This browser can't display the PDF here."* There is no automatic switch to PDF.js.
+[pdf-object-viewer.component.ts](angular-16/src/app/pdf-object-viewer/pdf-object-viewer.component.ts) points an `<object>` at the PDF and lets the browser display it, the same way as the plain version. If the browser has no PDF viewer (for example, Android in-app browsers), it shows the content inside the `<object>` tag instead: **Preview Unavailable**, with an **open the notice** link.
+
+- **Most browsers:** the link opens the PDF in a new tab.
+- **Android:** in-app browsers often ignore new tabs, so the link's click handler sends an `intent://` URL that opens the PDF in the user's default browser. It sets `window.location.href` directly, because binding an `intent://` URL to `[href]` makes Angular prefix it with `unsafe:`.
+
+There is no automatic switch to PDF.js.
 
 ### PDF.js flow — `/pdfjs`
 
@@ -383,6 +391,6 @@ If anything fails, the error is logged to the console and the frame stays empty.
 | *"Invalid Host header"* over Cloudflare | Start with `npm run start:tunnel`. `npm start -- --disable-host-check` doesn't work in PowerShell. |
 | Page keeps reloading over Cloudflare | Use `npx ng serve --disable-host-check --live-reload=false`. |
 | `/pdfjs` frame stays empty | Check the browser console. Usually the worker file (`assets/pdfjs/pdf.worker.min.js`) or the PDF failed to load. |
-| `/object` shows *"This browser can't display the PDF here."* | The browser has no built-in PDF viewer (common in Android in-app browsers). Use `/pdfjs` instead. |
+| `/object` shows "Preview Unavailable" | The browser has no built-in PDF viewer (common in Android in-app browsers). Tap **open the notice**, or use `/pdfjs` instead. |
 | `/object` or `/pdfjs` returns 404 in a production build | The static server needs to send unknown paths to `index.html`. With `http-server`, add `--proxy "http://localhost:8080?"`. |
 | *"Can't resolve 'src/styles.css'"* after pulling | `ng serve` only reads `angular.json` at startup. Stop it with `Ctrl+C` and run `npm start` again. |

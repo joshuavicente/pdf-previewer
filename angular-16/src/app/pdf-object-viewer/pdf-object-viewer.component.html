@@ -1,4 +1,4 @@
-<h1>View Individual Tax Notices</h1>
+<h2>View Individual Tax Notices</h2>
 
 <div class="pdf-wrapper">
   <object
@@ -7,7 +7,25 @@
     type="application/pdf"
     aria-label="PDF document preview"
   >
-    <p>This browser can't display the PDF here.</p>
+    <div class="pdf-fallback">
+      <h3>Preview Unavailable</h3>
+      <div>
+        Your browser cannot display the notice preview here. You can
+        <a
+          class="pdf-fallback-link"
+          [href]="src"
+          target="_blank"
+          rel="noopener"
+          (click)="openPdf($event)"
+        >
+          open the notice<img
+            class="icon icon-link"
+            src="assets/pdf-icons/link.svg"
+            alt=""
+        /></a>
+        in a separate tab to review it before downloading.
+      </div>
+    </div>
   </object>
 </div>
 
@@ -18,6 +36,7 @@
 
 <div class="share-row" *ngIf="canShare">
   <button class="link-share" type="button" (click)="shareLink()">
-    Share Link
+    <img class="icon" src="assets/pdf-icons/share.svg" alt="" />
+    <span>Share Link</span>
   </button>
 </div>
