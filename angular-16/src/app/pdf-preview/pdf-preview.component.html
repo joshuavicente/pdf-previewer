@@ -1,42 +1,4 @@
-<div class="pdf-wrapper">
-  <object
-    *ngIf="mode === 'object'"
-    class="pdf-viewer"
-    [data]="objectUrl"
-    type="application/pdf"
-    aria-label="PDF document preview"
-  >
-    <div class="pdf-fallback" #fallback>
-      <h3>Loading preview…</h3>
-    </div>
-  </object>
-
-  <div
-    *ngIf="mode === 'pdfjs'"
-    class="pdf-viewer pdf-pages"
-    #pages
-    aria-label="PDF document preview"
-  ></div>
-
-  <div *ngIf="mode === 'failed'" class="pdf-viewer pdf-fallback">
-    <h3>Preview Unavailable</h3>
-    <div>
-      Your browser cannot display the notice preview here. You can open the
-      notice in a separate tab to review it before downloading.
-    </div>
-    <button class="btn-open" type="button" (click)="openPdf()">
-      Open notice
-    </button>
-  </div>
-</div>
-
-<div class="button-row">
-  <a class="btn-download" [href]="src" download>Download</a>
-  <button class="btn-back" type="button" (click)="back()">Back</button>
-</div>
-
-<div class="share-row" *ngIf="canShare">
-  <button class="link-share" type="button" (click)="shareLink()">
-    Share Link
-  </button>
-</div>
+<nav class="flow-links">
+  <a routerLink="/object">Preview with &lt;object&gt;</a>
+  <a routerLink="/pdfjs">Preview with PDF.js</a>
+</nav>

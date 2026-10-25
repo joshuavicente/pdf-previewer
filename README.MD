@@ -5,9 +5,9 @@ A demo for previewing, opening, and downloading a PDF inside mobile browsers and
 | Version | What it is | Preview | Port | Page path |
 |---|---|---|---|---|
 | **[plain/](plain/)** | A single HTML file, no build step | Browser's own PDF viewer (`<object>`) | `5500` (Live Server) | `/plain/test-pdf-boilerplate.html` |
-| **[angular-16/](angular-16/)** | The same page as an Angular 16 standalone component | [PDF.js](https://mozilla.github.io/pdf.js/), drawn onto `<canvas>` | `4200` (`ng serve`) | `/` |
+| **[angular-16/](angular-16/)** | An Angular 16 app with one page per preview flow | Your choice: browser's own viewer (`<object>`) or [PDF.js](https://mozilla.github.io/pdf.js/) drawn onto `<canvas>` | `4200` (`ng serve`) | `/` (chooser), `/object`, `/pdfjs` |
 
-Use the **plain** version to check what a browser does on its own, and the **Angular** version to test the component the way it will run in an Angular 16 app.
+Use the **plain** version to check what a browser does on its own, and the **Angular** version to compare the `<object>` and PDF.js flows side by side the way they will run in an Angular 16 app.
 
 > [!IMPORTANT]
 > **Bring your own PDF files.**
@@ -16,7 +16,7 @@ Use the **plain** version to check what a browser does on its own, and the **Ang
 > PDF files are git-ignored (`*.pdf`), so each person adds their own copy.
 >
 > - **Plain version:** name it `test_notice.pdf` and place it in `plain/`, or update the four references to `test_notice.pdf` in [plain/test-pdf-boilerplate.html](plain/test-pdf-boilerplate.html) (the `<object data>`, the fallback link, the Download button, and the `PDF_PATH` constant).
-> - **Angular version:** place it in `angular-16/src/assets/` and update `pdfSrc` in [app.component.ts](angular-16/src/app/app.component.ts).
+> - **Angular version:** place it in `angular-16/src/assets/` and update `PDF_SRC` in [app.routes.ts](angular-16/src/app/app.routes.ts). Both flows use it.
 
 ---
 
@@ -47,13 +47,17 @@ Boilerplates/
     ├── angular.json                       # Copies the PDF.js worker into assets/pdfjs
     └── src/
         ├── assets/test_notice.pdf         # Your PDF (A4)
+        ├── styles.scss                    # Global styles (empty — each component styles itself)
         └── app/
-            ├── app.component.ts           # Sets which PDF to show (pdfSrc)
-            └── pdf-preview/
-                ├── pdf-preview.component.ts    # Preview logic (modes, PDF.js, open/share)
-                ├── pdf-preview.component.html  # Template
-                └── pdf-preview.component.css   # Styles
+            ├── app.routes.ts              # Routes + which PDF to show (PDF_SRC)
+            ├── app.config.ts              # Router setup (route data → component inputs)
+            ├── app.component.ts           # Just a <router-outlet>
+            ├── pdf-preview/               # "/"        Links to choose a flow
+            ├── pdf-object-viewer/         # "/object"  Browser's own viewer in an <object>
+            └── pdfjs-viewer/              # "/pdfjs"   Pages drawn onto <canvas> by PDF.js
 ```
+
+Each component folder has its own `.component.ts`, `.component.html` and `.component.scss`.
 
 ---
 
@@ -91,7 +95,7 @@ npm install     # first time only
 npm start       # runs "ng serve" with the project's own Angular 16 CLI
 ```
 
-Open `http://localhost:4200/`.
+Open `http://localhost:4200/` and choose **Preview with &lt;object&gt;** or **Preview with PDF.js**. You can also go straight to `http://localhost:4200/object` or `http://localhost:4200/pdfjs`.
 
 | npm script | Runs | Use it for |
 |---|---|---|
@@ -253,9 +257,11 @@ You need two terminals: one runs the server, the other runs the tunnel.
 ```powershell
 cd angular-16
 npm run build
-npx http-server dist/angular-16 -p 8080
+npx http-server dist/angular-16 -p 8080 --proxy "http://localhost:8080?"
 cloudflared tunnel --url http://localhost:8080    # in a second terminal
 ```
+
+> `--proxy "http://localhost:8080?"` sends unknown paths back to `index.html`, so opening or refreshing `/object` or `/pdfjs` directly works instead of returning 404.
 
 ### Finding the URL
 
@@ -277,50 +283,51 @@ Press `Ctrl+C` to stop the tunnel.
 
 ## 🅰️ 5. How the Angular Preview Works
 
-`PdfPreviewComponent` ([pdf-preview.component.ts](angular-16/src/app/pdf-preview/pdf-preview.component.ts)) is always in one of three modes:
+The Angular app has three pages, set up in [app.routes.ts](angular-16/src/app/app.routes.ts):
 
-| Mode | Shows |
-|---|---|
-| `'object'` | The browser's own PDF viewer in an `<object>` |
-| `'pdfjs'` | Each page drawn onto a `<canvas>` by PDF.js |
-| `'failed'` | "Preview Unavailable" with an **Open notice** button |
-
-### Current setup: PDF.js for everyone
-
-The component starts in **`'pdfjs'`** mode (`mode: PreviewMode = 'pdfjs'`), so every browser — desktop, iOS, Android, in-app — renders the PDF with PDF.js. This gives the same result on every device, including Android in-app browsers that have no PDF viewer.
-
-If PDF.js fails (download error, unreadable file, missing worker), the component switches to `'failed'` and shows **Open notice**. That button calls `window.open` (or the Android `intent://` hand-off to the default browser) directly in the click handler, so the pop-up blocker allows it.
-
-### Alternative: native preview first
-
-Change the starting mode to `'object'` to use the browser's own viewer and fall back to PDF.js only when needed:
-
-```ts
-mode: PreviewMode = 'object';
-```
-
-It then switches to PDF.js when:
-- the browser reports it has no PDF viewer (`navigator.pdfViewerEnabled === false`), or
-- the `<object>` fallback content is visible after the page loads (the preview failed), or
-- the URL contains `?forcePdfJs` (for testing the fallback on desktop).
-
-| | `'pdfjs'` (current) | `'object'` |
+| Path | Component | Shows |
 |---|---|---|
-| Looks the same everywhere | ✅ | ❌ Depends on the browser's viewer |
-| Browser zoom / text selection / search | ❌ Pages are images | ✅ |
-| Extra download | Always: PDF.js (~75 kB gzipped) + worker (~1 MB) | Only when the native preview fails |
+| `/` | `PdfPreviewComponent` | Two links for choosing a preview flow |
+| `/object` | `PdfObjectViewerComponent` | The browser's own PDF viewer in an `<object>` |
+| `/pdfjs` | `PdfJsViewerComponent` | Each page drawn onto a `<canvas>` by PDF.js |
+
+The two flows are **completely separate**: neither one imports the other, falls back to it, or shares styles with it. Each page has its own heading, **Download** / **Back** / **Share Link** buttons and stylesheet, so you can read or copy one flow on its own. **Back** returns to the chooser.
+
+The PDF path is set once, as `PDF_SRC` in [app.routes.ts](angular-16/src/app/app.routes.ts). The router passes it to each viewer's `src` input through route `data`, because `withComponentInputBinding()` is enabled in [app.config.ts](angular-16/src/app/app.config.ts).
+
+### `<object>` flow — `/object`
+
+[pdf-object-viewer.component.ts](angular-16/src/app/pdf-object-viewer/pdf-object-viewer.component.ts) points an `<object>` at the PDF and lets the browser display it. If the browser has no PDF viewer (for example, Android in-app browsers), it shows the text inside the `<object>` tag instead: *"This browser can't display the PDF here."* There is no automatic switch to PDF.js.
+
+### PDF.js flow — `/pdfjs`
+
+[pdfjs-viewer.component.ts](angular-16/src/app/pdfjs-viewer/pdfjs-viewer.component.ts) draws the PDF itself:
+
+1. After the view is ready, it loads PDF.js with `import('pdfjs-dist')`. The work runs outside Angular's change detection.
+2. It points `GlobalWorkerOptions.workerSrc` at `assets/pdfjs/pdf.worker.min.js`, the background worker that parses the PDF.
+3. `getDocument(url)` loads the PDF.
+4. For each page, it creates a `<canvas>` scaled to the container's width × `devicePixelRatio` (so text stays sharp on high-DPI screens) and calls `page.render()`.
+
+If anything fails, the error is logged to the console and the frame stays empty.
+
+| | `/object` | `/pdfjs` |
+|---|---|---|
+| Looks the same everywhere | ❌ Depends on the browser's viewer | ✅ |
+| Works without a built-in viewer (e.g. Android in-app browsers) | ❌ | ✅ |
+| Browser zoom / text selection / search | ✅ | ❌ Pages are images |
+| Extra download | None | PDF.js (~75 kB gzipped) + worker (~1 MB) |
 
 ### Angular-specific notes
 
 | Topic | Detail |
 |---|---|
 | `<object [data]>` | Angular blocks the binding unless the URL is trusted with `DomSanitizer.bypassSecurityTrustResourceUrl`. |
-| `intent://` links | Binding them to `[href]` makes Angular prefix them with `unsafe:`. The component sets `window.location.href` in the click handler instead. |
 | PDF.js version | Pinned to `pdfjs-dist` **3.11.x**. Version 4+ causes build problems with Angular 16 and needs newer browsers. |
-| PDF.js loading | Loaded with a dynamic `import('pdfjs-dist')`, so it's a separate file that downloads only when PDF.js mode is used. |
+| PDF.js loading | Loaded with a dynamic `import('pdfjs-dist')`, so it's a separate file that only downloads when `/pdfjs` is opened. |
 | PDF.js worker | Copied from `node_modules/pdfjs-dist/build` to `assets/pdfjs/` by the `assets` entry in [angular.json](angular-16/angular.json). Copy that entry when moving the component into your app. |
-| Pop-up blocker | Keep `openPdf()` synchronous. An `await` before `window.open` can get it blocked. |
-| Current limits | No zoom or text selection in PDF.js mode, pages aren't redrawn on rotation/resize, and every page is drawn up front (fine for short notices). |
+| Canvas styles | The canvases are created in code, so they don't get Angular's scoped style attribute. Their styles use `::ng-deep`. |
+| Styles | All styles are SCSS. Each component has its own `.scss` file; [styles.scss](angular-16/src/styles.scss) is empty. |
+| Current limits | No zoom or text selection in PDF.js, pages aren't redrawn on rotation/resize, and every page is drawn up front (fine for short notices). |
 
 ---
 
@@ -375,4 +382,7 @@ It then switches to PDF.js when:
 | *"Port 4200 is already in use"* | Another `ng serve` is still running — stop it with `Ctrl+C` in its terminal, or use `npx ng serve --port 4300`. |
 | *"Invalid Host header"* over Cloudflare | Start with `npm run start:tunnel`. `npm start -- --disable-host-check` doesn't work in PowerShell. |
 | Page keeps reloading over Cloudflare | Use `npx ng serve --disable-host-check --live-reload=false`. |
-| "Preview Unavailable" in PDF.js mode | Check the browser console. Usually the worker file (`assets/pdfjs/pdf.worker.min.js`) or the PDF failed to load. |
+| `/pdfjs` frame stays empty | Check the browser console. Usually the worker file (`assets/pdfjs/pdf.worker.min.js`) or the PDF failed to load. |
+| `/object` shows *"This browser can't display the PDF here."* | The browser has no built-in PDF viewer (common in Android in-app browsers). Use `/pdfjs` instead. |
+| `/object` or `/pdfjs` returns 404 in a production build | The static server needs to send unknown paths to `index.html`. With `http-server`, add `--proxy "http://localhost:8080?"`. |
+| *"Can't resolve 'src/styles.css'"* after pulling | `ng serve` only reads `angular.json` at startup. Stop it with `Ctrl+C` and run `npm start` again. |

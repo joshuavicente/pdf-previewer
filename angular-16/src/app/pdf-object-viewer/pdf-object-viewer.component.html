@@ -1,0 +1,23 @@
+<h1>View Individual Tax Notices</h1>
+
+<div class="pdf-wrapper">
+  <object
+    class="pdf-viewer"
+    [data]="objectUrl"
+    type="application/pdf"
+    aria-label="PDF document preview"
+  >
+    <p>This browser can't display the PDF here.</p>
+  </object>
+</div>
+
+<div class="button-row">
+  <a class="btn-download" [href]="src" download>Download</a>
+  <button class="btn-back" type="button" (click)="back()">Back</button>
+</div>
+
+<div class="share-row" *ngIf="canShare">
+  <button class="link-share" type="button" (click)="shareLink()">
+    Share Link
+  </button>
+</div>
