@@ -3,33 +3,45 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 32px;
+  padding: 40px 20px;
   box-sizing: border-box;
   font-family: sans-serif;
 }
 
-h2 {
+@media (max-width: 767px) {
+  :host {
+    padding: 40px 15px;
+  }
+}
+
+.pdf-title {
+  font-size: 1.875rem;
+  line-height: 1.27;
+  font-weight: 300;
+  width: min(100%, 920px);
   margin-top: 64px;
-  margin-bottom: 16px;
-  text-align: center;
+  margin-bottom: 32px;
+  text-align: start;
 }
 
 .pdf-wrapper {
-  width: min(100%, 800px);
+  width: min(100%, 920px);
   max-width: 100%;
 }
 
 .pdf-viewer {
   display: block;
   width: 100%;
-  height: min(1123px, calc(100dvh - 400px));
+  // A4 proportions (210 × 297 mm): fills the wrapper's width, and the height
+  // follows so exactly one page fits in the frame.
+  aspect-ratio: 210 / 297;
 }
 
 // Pages stacked as canvases, scrolling inside the frame.
 .pdf-pages {
   overflow-y: auto;
   background-color: #f2f2f2;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #808080;
   border-radius: 4px;
   box-sizing: border-box;
 }
@@ -41,6 +53,52 @@ h2 {
   margin-bottom: 8px;
   background-color: white;
 }
+
+// Shown instead of the pages when PDF.js fails. Same width and border as the
+// PDF frame so the layout doesn't jump.
+.pdf-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: min(100%, 920px);
+  padding: 48px 40px;
+  box-sizing: border-box;
+  border: 1px solid #808080;
+  border-radius: 4px;
+  background-color: #fafafa;
+  text-align: center;
+  line-height: 1.5;
+  color: #333;
+
+  h3 {
+    margin: 0;
+  }
+
+  // Keep the message to a readable line length on wide screens.
+  > div {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 767px) {
+  .pdf-fallback {
+    padding: 32px 20px;
+  }
+}
+
+.pdf-fallback-link {
+  color: #0066cc;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.icon-link {
+  margin-left: 4px;
+  vertical-align: text-bottom;
+}
+
 .button-row {
   display: flex;
   flex-direction: column;
@@ -50,7 +108,6 @@ h2 {
   width: min(100%, 800px);
 }
 
-/* Desktop: side by side, Back on the left and Download on the right. */
 @media (min-width: 768px) {
   .button-row {
     flex-direction: row-reverse;

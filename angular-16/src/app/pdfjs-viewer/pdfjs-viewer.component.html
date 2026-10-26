@@ -1,8 +1,32 @@
-<h2>View Individual Tax Notices</h2>
-
 <div class="pdf-wrapper">
-  <div class="pdf-viewer pdf-pages" #pages aria-label="PDF document preview"></div>
+  <h2 class="pdf-title">View Individual Tax Notices</h2>
+  <div
+    *ngIf="!isPdfFailed"
+    class="pdf-viewer pdf-pages"
+    #pages
+    aria-label="PDF document preview"
+  ></div>
 </div>
+
+<div class="pdf-fallback" *ngIf="isPdfFailed">
+   <h3>Preview Unavailable</h3>
+    <div>
+      Your browser cannot display the notice preview here. You can
+      <a
+        class="pdf-fallback-link"
+        [href]="src"
+        target="_blank"
+        rel="noopener"
+        (click)="openPdf($event)"
+      >
+        open the notice<img
+          class="icon icon-link"
+          src="assets/pdf-icons/link.svg"
+          alt=""
+      /></a>
+      in a separate tab to review it before downloading.
+    </div>
+  </div>
 
 <div class="button-row">
   <a class="btn-download" [href]="src" download>Download</a>

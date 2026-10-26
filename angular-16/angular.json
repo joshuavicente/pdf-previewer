@@ -53,8 +53,8 @@
               "src/favicon.ico",
               "src/assets",
               {
-                "glob": "pdf.worker.min.js",
-                "input": "node_modules/pdfjs-dist/build",
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/legacy/build",
                 "output": "assets/pdfjs"
               }
             ],

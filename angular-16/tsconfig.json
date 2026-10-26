@@ -16,6 +16,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
     "importHelpers": true,
+    "skipLibCheck": true, // Needed for Angular 16, as it is locked to TS 5.1
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
